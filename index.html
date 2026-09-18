@@ -15,7 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .glass {
-            background: rgba(22, 27, 34, 0.75);
+            background: rgba(22, 27, 34, 0.85);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -31,13 +31,13 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <!-- Auth / Login Modal -->
-    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden">
-        <div class="glass p-8 rounded-2xl w-full max-w-md border border-amber-500/30 shadow-2xl">
+    <!-- Auth / Login Modal (সরাসরি পেজ লোডে শো করবে যদি লগইন না থাকে) -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md">
+        <div class="glass p-8 rounded-2xl w-full max-w-md border border-amber-500/40 shadow-2xl mx-4">
             <div class="text-center mb-6">
                 <i class="fa-solid fa-shield-halved text-5xl text-amber-500 mb-2"></i>
-                <h2 class="text-2xl font-bold tracking-wide">Kabir CCTV Login</h2>
-                <p class="text-xs text-gray-400">আপনার এক্সেস নিশ্চিত করতে লগইন করুন</p>
+                <h2 class="text-2xl font-bold tracking-wide text-white">Kabir CCTV Login</h2>
+                <p class="text-xs text-gray-400">আপনার তথ্য দিয়ে প্রবেশ করুন</p>
             </div>
             
             <!-- Ban Alert Message -->
@@ -46,11 +46,11 @@
             <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
                 <div>
                     <label class="text-xs text-gray-300 block mb-1">আপনার নাম</label>
-                    <input type="text" id="username" required placeholder="Name enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    <input type="text" id="username" required placeholder="Name enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
                 <div>
                     <label class="text-xs text-gray-300 block mb-1">পাসওয়ার্ড</label>
-                    <input type="password" id="password" required placeholder="Password enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    <input type="password" id="password" required placeholder="Password enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
                 <button type="submit" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition">Login</button>
             </form>
@@ -66,9 +66,9 @@
 
         <!-- Promo Code Section -->
         <div class="flex items-center space-x-2 my-2 sm:my-0">
-            <div class="relative">
-                <input type="text" id="promoInput" placeholder="Promo Code..." class="bg-gray-900/80 text-xs text-amber-400 border border-amber-500/40 rounded-full px-4 py-2 focus:outline-none w-44">
-                <button onclick="applyPromo()" class="absolute right-1 top-1 bottom-1 px-3 bg-amber-500 text-black font-bold text-xs rounded-full hover:bg-amber-400">Apply</button>
+            <div class="relative flex items-center">
+                <input type="text" id="promoInput" placeholder="Promo Code..." class="bg-gray-900 text-xs text-amber-400 border border-amber-500/40 rounded-full pl-4 pr-16 py-2 focus:outline-none w-48">
+                <button type="button" onclick="applyPromo()" class="absolute right-1 px-3 py-1 bg-amber-500 text-black font-bold text-xs rounded-full hover:bg-amber-400 transition">Apply</button>
             </div>
         </div>
 
@@ -78,7 +78,8 @@
                 <div id="userDisplayName" class="text-sm font-semibold text-gray-200">Guest</div>
                 <span id="roleBadge" class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full border border-gray-700">User</span>
             </div>
-            <button onclick="logoutUser()" class="text-gray-400 hover:text-red-400 text-sm" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <button type="button" onclick="openLoginModal()" class="text-amber-400 hover:text-amber-300 text-xs border border-amber-500/30 px-2 py-1 rounded-md" title="Login / Switch Account"><i class="fa-solid fa-user mr-1"></i>Login</button>
+            <button type="button" onclick="logoutUser()" class="text-gray-400 hover:text-red-400 text-sm" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
         </div>
     </header>
 
@@ -99,18 +100,18 @@
                 <div>
                     <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-plus-circle mr-1"></i> নতুন প্রোডাক্ট যোগ করুন</h3>
                     <form onsubmit="handleAddProduct(event)" class="space-y-3">
-                        <input type="text" id="prodName" placeholder="প্রোডাক্ট এর নাম" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-                        <select id="prodCategory" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                        <input type="text" id="prodName" placeholder="প্রোডাক্ট এর নাম" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <select id="prodCategory" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                             <option value="100x Zoom Camera">100x Zoom Camera</option>
                             <option value="Kabir Bhai Special Bedroom Camera">Kabir Bhai Special Bedroom Camera</option>
                             <option value="Ground Floor Kabir CCTV">Ground Floor Kabir CCTV</option>
                             <option value="All-Rounder CCTV Kabir">All-Rounder CCTV Kabir</option>
                         </select>
-                        <input type="text" id="prodImg" placeholder="Image URL (http://...)" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-                        <input type="text" id="prodDesc" placeholder="প্রোডাক্ট এর বিস্তারিত Details" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                        <input type="text" id="prodImg" placeholder="Image URL (http://...)" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <input type="text" id="prodDesc" placeholder="প্রোডাক্ট এর বিস্তারিত Details" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         <div class="flex gap-2">
-                            <input type="text" id="prodDiscount" placeholder="Discount Code" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
-                            <input type="number" id="prodPrice" placeholder="মূল্য (BDT)" required class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                            <input type="text" id="prodDiscount" placeholder="Discount Code" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                            <input type="number" id="prodPrice" placeholder="মূল্য (BDT)" required class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         </div>
                         <button type="submit" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90">Add Product</button>
                     </form>
@@ -129,7 +130,7 @@
                                 </tr>
                             </thead>
                             <tbody id="usersTableBody">
-                                <!-- User records will be populated here -->
+                                <!-- User records populated here -->
                             </tbody>
                         </table>
                     </div>
@@ -151,7 +152,7 @@
 
     <!-- Footer -->
     <footer class="glass border-t border-gray-800 text-center py-4 text-xs text-gray-500">
-        &copy; 2026 Kabir CCTV Official. All Rights Reserved. Premium Surveillance Systems.
+        &copy; 2026 Kabir CCTV Official. All Rights Reserved.
     </footer>
 
     <!-- JavaScript Logic -->
@@ -198,36 +199,47 @@
         let currentUser = null;
         let isOwner = false;
 
-        window.onload = function() {
+        // Page Load Engine
+        window.addEventListener('DOMContentLoaded', () => {
             if (!localStorage.getItem('kabir_products')) {
                 localStorage.setItem('kabir_products', JSON.stringify(defaultProducts));
             }
             
             const savedUser = JSON.parse(localStorage.getItem('kabir_logged_user'));
-            if (!savedUser) {
-                document.getElementById('loginModal').classList.remove('hidden');
-            } else {
-                // Check if current user is banned
-                if(isUserBanned(savedUser.name)) {
+            if (savedUser) {
+                if (checkBanStatus(savedUser.name).banned) {
                     logoutUser();
                 } else {
                     currentUser = savedUser;
+                    document.getElementById('loginModal').classList.add('hidden');
                     updateUserUI();
                 }
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
             }
+            
             renderProducts();
-        };
+        });
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
 
         // Login Handler
         function handleLogin(e) {
             e.preventDefault();
             const name = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
-
             const banMsg = document.getElementById('banMessage');
+
             banMsg.classList.add('hidden');
 
-            // Check if User is Banned
+            if (!name || !pass) {
+                alert("দয়া করে নাম এবং পাসওয়ার্ড দিন!");
+                return;
+            }
+
+            // Check if Banned
             const banStatus = checkBanStatus(name);
             if (banStatus.banned) {
                 banMsg.innerText = banStatus.message;
@@ -235,43 +247,47 @@
                 return;
             }
 
-            if (name && pass) {
-                const userObj = { name, pass };
-                
-                localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
-                currentUser = userObj;
+            const userObj = { name, pass };
+            localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
+            currentUser = userObj;
 
-                let userList = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
-                if(!userList.some(u => u.name === name)) {
-                    userList.push(userObj);
-                    localStorage.setItem('kabir_user_history', JSON.stringify(userList));
-                }
-
-                document.getElementById('loginModal').classList.add('hidden');
-                updateUserUI();
+            // Save to overall history
+            let userList = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
+            if(!userList.some(u => u.name === name)) {
+                userList.push(userObj);
+                localStorage.setItem('kabir_user_history', JSON.stringify(userList));
             }
+
+            document.getElementById('loginModal').classList.add('hidden');
+            updateUserUI();
         }
 
-        // Promo Code Logic
+        // Promo Code Applied
         function applyPromo() {
-            const code = document.getElementById('promoInput').value.trim();
+            const inputField = document.getElementById('promoInput');
+            const code = inputField.value.trim();
             
+            if (!code) {
+                alert("দয়া করে একটি প্রমো কোড লিখুন!");
+                return;
+            }
+
             if (code === "Fahim_4419") {
                 isOwner = true;
                 alert("🎉 Owner Mode Activated! আপনি এখন ওয়েবসাইট নিয়ন্ত্রণ ও ইউজারদের ব্যান করতে পারবেন।");
-                document.getElementById('promoInput').value = "";
+                inputField.value = "";
                 updateUserUI();
             } else if (code === "exit") {
                 if(isOwner) {
                     isOwner = false;
                     alert("Owner Mode exited. সাধারণ ইউজার মোডে ফিরছেন।");
-                    document.getElementById('promoInput').value = "";
+                    inputField.value = "";
                     updateUserUI();
                 } else {
-                    alert("আপনি এখন Owner মোডে নেই!");
+                    alert("আপনি বর্তমানে Owner মোডে নেই!");
                 }
             } else {
-                alert("অবৈধ প্রমো কোড!");
+                alert("❌ ভুল প্রমো কোড!");
             }
         }
 
@@ -298,8 +314,11 @@
 
         function logoutUser() {
             localStorage.removeItem('kabir_logged_user');
+            currentUser = null;
             isOwner = false;
-            location.reload();
+            document.getElementById('userDisplayName').innerText = "Guest";
+            document.getElementById('loginModal').classList.remove('hidden');
+            updateUserUI();
         }
 
         function renderProducts() {
@@ -329,7 +348,7 @@
                             <span class="text-xs text-gray-400 block">Price</span>
                             <span class="text-lg font-bold text-amber-400">৳ ${p.price}</span>
                         </div>
-                        ${isOwner ? `<button onclick="deleteProduct(${p.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-trash mr-1"></i> Delete</button>` : `<button class="gold-bg text-black px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Order Now</button>`}
+                        ${isOwner ? `<button type="button" onclick="deleteProduct(${p.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-trash mr-1"></i> Delete</button>` : `<button type="button" onclick="alert('অর্ডার সাবমিট করা হয়েছে!')" class="gold-bg text-black px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Order Now</button>`}
                     </div>
                 `;
                 grid.appendChild(card);
@@ -360,28 +379,4 @@
             renderProducts();
             alert("প্রোডাক্ট সফলভাবে যোগ করা হয়েছে!");
         }
-
-        function deleteProduct(id) {
-            if (!isOwner) return;
-            if (confirm("আপনি কি নিশ্চিত এই প্রোডাক্টটি ডিলিট করতে চান?")) {
-                let products = JSON.parse(localStorage.getItem('kabir_products')) || [];
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('kabir_products', JSON.stringify(products));
-                renderProducts();
-            }
-        }
-
-        // --- BAN SYSTEM LOGIC ---
-
-        function renderUsersTable() {
-            const users = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = "";
-
-            users.forEach(u => {
-                const banStatus = checkBanStatus(u.name);
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-800 text-gray-300";
-                tr.innerHTML = `
-                    <td class="p-2 font-medium">${u.name}</td>
-                    <td 
+            

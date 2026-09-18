@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kabir CCTV - Premium Surveillance Solutions</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #f0f6fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .glass {
+            background: rgba(22, 27, 34, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .gold-gradient {
+            background: linear-gradient(135deg, #f39c12, #d35400);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-bg {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Auth / Login Modal -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden">
+        <div class="glass p-8 rounded-2xl w-full max-w-md border border-amber-500/30 shadow-2xl">
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-shield-halved text-5xl text-amber-500 mb-2"></i>
+                <h2 class="text-2xl font-bold tracking-wide">Kabir CCTV Login</h2>
+                <p class="text-xs text-gray-400">আপনার এক্সেস নিশ্চিত করতে লগইন করুন</p>
+            </div>
+            
+            <!-- Ban Alert Message -->
+            <div id="banMessage" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs text-center font-bold"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-300 block mb-1">আপনার নাম</label>
+                    <input type="text" id="username" required placeholder="Name enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-300 block mb-1">পাসওয়ার্ড</label>
+                    <input type="password" id="password" required placeholder="Password enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500">
+                </div>
+                <button type="submit" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header class="glass sticky top-0 z-40 px-6 py-4 flex flex-wrap justify-between items-center shadow-lg border-b border-gray-800">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-video text-2xl text-amber-500"></i>
+            <h1 class="text-2xl font-black tracking-wider gold-gradient">KABIR CCTV</h1>
+        </div>
+
+        <!-- Promo Code Section -->
+        <div class="flex items-center space-x-2 my-2 sm:my-0">
+            <div class="relative">
+                <input type="text" id="promoInput" placeholder="Promo Code..." class="bg-gray-900/80 text-xs text-amber-400 border border-amber-500/40 rounded-full px-4 py-2 focus:outline-none w-44">
+                <button onclick="applyPromo()" class="absolute right-1 top-1 bottom-1 px-3 bg-amber-500 text-black font-bold text-xs rounded-full hover:bg-amber-400">Apply</button>
+            </div>
+        </div>
+
+        <!-- User Info & Role Badge -->
+        <div class="flex items-center space-x-4">
+            <div id="userBadge" class="text-right">
+                <div id="userDisplayName" class="text-sm font-semibold text-gray-200">Guest</div>
+                <span id="roleBadge" class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full border border-gray-700">User</span>
+            </div>
+            <button onclick="logoutUser()" class="text-gray-400 hover:text-red-400 text-sm" title="Logout"><i class="fa-solid fa-right-from-bracket"></i></button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full">
+
+        <!-- Owner / Admin Controls (Hidden by Default) -->
+        <div id="ownerPanel" class="hidden mb-10 p-6 glass rounded-2xl border-2 border-amber-500/50 shadow-2xl">
+            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
+                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-crown"></i> Owner & Admin Control Panel
+                </h2>
+                <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full">Owner Mode Active</span>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Add New Product Form -->
+                <div>
+                    <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-plus-circle mr-1"></i> নতুন প্রোডাক্ট যোগ করুন</h3>
+                    <form onsubmit="handleAddProduct(event)" class="space-y-3">
+                        <input type="text" id="prodName" placeholder="প্রোডাক্ট এর নাম" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                        <select id="prodCategory" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                            <option value="100x Zoom Camera">100x Zoom Camera</option>
+                            <option value="Kabir Bhai Special Bedroom Camera">Kabir Bhai Special Bedroom Camera</option>
+                            <option value="Ground Floor Kabir CCTV">Ground Floor Kabir CCTV</option>
+                            <option value="All-Rounder CCTV Kabir">All-Rounder CCTV Kabir</option>
+                        </select>
+                        <input type="text" id="prodImg" placeholder="Image URL (http://...)" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                        <input type="text" id="prodDesc" placeholder="প্রোডাক্ট এর বিস্তারিত Details" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                        <div class="flex gap-2">
+                            <input type="text" id="prodDiscount" placeholder="Discount Code" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                            <input type="number" id="prodPrice" placeholder="মূল্য (BDT)" required class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+                        </div>
+                        <button type="submit" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90">Add Product</button>
+                    </form>
+                </div>
+
+                <!-- Logged-in Users & Ban System -->
+                <div>
+                    <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-users-slash mr-1"></i> ইউজার ম্যানেজমেন্ট ও ব্যান সিস্টেম</h3>
+                    <div class="bg-gray-900/90 rounded-lg p-3 border border-gray-800 max-h-72 overflow-y-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-gray-400 border-b border-gray-800">
+                                    <th class="p-2">Name</th>
+                                    <th class="p-2">Password</th>
+                                    <th class="p-2 text-center">Action / Ban</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- User records will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banner / Hero Section -->
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-extrabold mb-3">Ultra Security, Powered by <span class="gold-gradient">Kabir CCTV</span></h2>
+            <p class="text-gray-400 max-w-2xl mx-auto text-sm">আপনার বাড়ি, অফিস এবং স্পেশাল স্পেসের সুরক্ষায় ২০০% নির্ভরযোগ্য সর্বাধুনিক প্রিমিয়াম সিসিটিভি ক্যামেরা।</p>
+        </div>
+
+        <!-- Products Display Grid -->
+        <div id="productsGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Dynamic Products will load here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass border-t border-gray-800 text-center py-4 text-xs text-gray-500">
+        &copy; 2026 Kabir CCTV Official. All Rights Reserved. Premium Surveillance Systems.
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const defaultProducts = [
+            {
+                id: 1,
+                name: "Kabir 100x Zoom Ultra Optics",
+                category: "100x Zoom Camera",
+                image: "https://images.unsplash.com/photo-1557862921-37829c790f19?auto=format&fit=crop&w=600&q=80",
+                desc: "দূরপাল্লার নিখুঁত নজরদারির জন্য ১০০x অপটিক্যাল জুম এবং ক্লিয়ার নাইট ভিশন।",
+                discount: "ZOOM100",
+                price: 15500
+            },
+            {
+                id: 2,
+                name: "Kabir Special Bedroom SafeCam",
+                category: "Kabir Bhai Special Bedroom Camera",
+                image: "https://images.unsplash.com/photo-1585771724684-38269d6639fd?auto=format&fit=crop&w=600&q=80",
+                desc: "বিশেষ প্রাইভেসি প্রটেকশন মোড, সিক্রেট লেন্স এবং ২-ওয়ে অডিও সুবিধা।",
+                discount: "BEDROOM_PRO",
+                price: 12000
+            },
+            {
+                id: 3,
+                name: "Kabir Ground Floor Heavy Guard",
+                category: "Ground Floor Kabir CCTV",
+                image: "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=600&q=80",
+                desc: "ওয়াটারপ্রুফ মেটাল বডি, মোশন সেন্সর আলার্ম এবং ২৪/৭ আউটার কভারেজ।",
+                discount: "GROUND50",
+                price: 8900
+            },
+            {
+                id: 4,
+                name: "Kabir All-Rounder 360 Vision",
+                category: "All-Rounder CCTV Kabir",
+                image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
+                desc: "৩৬০ ডিগ্রি রোটেশন, AI ট্র্যাকিং এবং অল-ইন-ওয়ান স্মার্ত মনিটরিং ফিচার।",
+                discount: "ALLROUNDER",
+                price: 9900
+            }
+        ];
+
+        let currentUser = null;
+        let isOwner = false;
+
+        window.onload = function() {
+            if (!localStorage.getItem('kabir_products')) {
+                localStorage.setItem('kabir_products', JSON.stringify(defaultProducts));
+            }
+            
+            const savedUser = JSON.parse(localStorage.getItem('kabir_logged_user'));
+            if (!savedUser) {
+                document.getElementById('loginModal').classList.remove('hidden');
+            } else {
+                // Check if current user is banned
+                if(isUserBanned(savedUser.name)) {
+                    logoutUser();
+                } else {
+                    currentUser = savedUser;
+                    updateUserUI();
+                }
+            }
+            renderProducts();
+        };
+
+        // Login Handler
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value.trim();
+
+            const banMsg = document.getElementById('banMessage');
+            banMsg.classList.add('hidden');
+
+            // Check if User is Banned
+            const banStatus = checkBanStatus(name);
+            if (banStatus.banned) {
+                banMsg.innerText = banStatus.message;
+                banMsg.classList.remove('hidden');
+                return;
+            }
+
+            if (name && pass) {
+                const userObj = { name, pass };
+                
+                localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
+                currentUser = userObj;
+
+                let userList = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
+                if(!userList.some(u => u.name === name)) {
+                    userList.push(userObj);
+                    localStorage.setItem('kabir_user_history', JSON.stringify(userList));
+                }
+
+                document.getElementById('loginModal').classList.add('hidden');
+                updateUserUI();
+            }
+        }
+
+        // Promo Code Logic
+        function applyPromo() {
+            const code = document.getElementById('promoInput').value.trim();
+            
+            if (code === "Fahim_4419") {
+                isOwner = true;
+                alert("🎉 Owner Mode Activated! আপনি এখন ওয়েবসাইট নিয়ন্ত্রণ ও ইউজারদের ব্যান করতে পারবেন।");
+                document.getElementById('promoInput').value = "";
+                updateUserUI();
+            } else if (code === "exit") {
+                if(isOwner) {
+                    isOwner = false;
+                    alert("Owner Mode exited. সাধারণ ইউজার মোডে ফিরছেন।");
+                    document.getElementById('promoInput').value = "";
+                    updateUserUI();
+                } else {
+                    alert("আপনি এখন Owner মোডে নেই!");
+                }
+            } else {
+                alert("অবৈধ প্রমো কোড!");
+            }
+        }
+
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('userDisplayName').innerText = currentUser.name;
+            }
+
+            const ownerPanel = document.getElementById('ownerPanel');
+            const roleBadge = document.getElementById('roleBadge');
+
+            if (isOwner) {
+                ownerPanel.classList.remove('hidden');
+                roleBadge.innerText = "Owner / Admin";
+                roleBadge.className = "text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/40";
+                renderUsersTable();
+            } else {
+                ownerPanel.classList.add('hidden');
+                roleBadge.innerText = "User";
+                roleBadge.className = "text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full border border-gray-700";
+            }
+            renderProducts();
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('kabir_logged_user');
+            isOwner = false;
+            location.reload();
+        }
+
+        function renderProducts() {
+            const products = JSON.parse(localStorage.getItem('kabir_products')) || [];
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = "";
+
+            products.forEach(p => {
+                const card = document.createElement('div');
+                card.className = "glass rounded-2xl overflow-hidden shadow-lg border border-gray-800 flex flex-col justify-between hover:border-amber-500/50 transition duration-300";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
+                            <span class="absolute top-2 left-2 bg-black/70 backdrop-blur-md text-amber-400 text-[10px] px-2 py-1 rounded-md border border-amber-500/30">
+                                ${p.category}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-base text-gray-100 mb-1">${p.name}</h3>
+                            <p class="text-xs text-gray-400 mb-3">${p.desc}</p>
+                            ${p.discount ? `<div class="text-[11px] text-amber-400 mb-2"><i class="fa-solid fa-ticket mr-1"></i> Discount Code: <span class="font-mono bg-amber-500/10 px-1 py-0.5 rounded border border-amber-500/30">${p.discount}</span></div>` : ''}
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0 border-t border-gray-800/50 mt-2 flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-gray-400 block">Price</span>
+                            <span class="text-lg font-bold text-amber-400">৳ ${p.price}</span>
+                        </div>
+                        ${isOwner ? `<button onclick="deleteProduct(${p.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition"><i class="fa-solid fa-trash mr-1"></i> Delete</button>` : `<button class="gold-bg text-black px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Order Now</button>`}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function handleAddProduct(e) {
+            e.preventDefault();
+            if (!isOwner) return;
+
+            const name = document.getElementById('prodName').value;
+            const category = document.getElementById('prodCategory').value;
+            const image = document.getElementById('prodImg').value;
+            const desc = document.getElementById('prodDesc').value;
+            const discount = document.getElementById('prodDiscount').value;
+            const price = document.getElementById('prodPrice').value;
+
+            const products = JSON.parse(localStorage.getItem('kabir_products')) || [];
+            products.push({ id: Date.now(), name, category, image, desc, discount, price });
+            localStorage.setItem('kabir_products', JSON.stringify(products));
+            
+            document.getElementById('prodName').value = '';
+            document.getElementById('prodImg').value = '';
+            document.getElementById('prodDesc').value = '';
+            document.getElementById('prodDiscount').value = '';
+            document.getElementById('prodPrice').value = '';
+
+            renderProducts();
+            alert("প্রোডাক্ট সফলভাবে যোগ করা হয়েছে!");
+        }
+
+        function deleteProduct(id) {
+            if (!isOwner) return;
+            if (confirm("আপনি কি নিশ্চিত এই প্রোডাক্টটি ডিলিট করতে চান?")) {
+                let products = JSON.parse(localStorage.getItem('kabir_products')) || [];
+                products = products.filter(p => p.id !== id);
+                localStorage.setItem('kabir_products', JSON.stringify(products));
+                renderProducts();
+            }
+        }
+
+        // --- BAN SYSTEM LOGIC ---
+
+        function renderUsersTable() {
+            const users = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = "";
+
+            users.forEach(u => {
+                const banStatus = checkBanStatus(u.name);
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-800 text-gray-300";
+                tr.innerHTML = `
+                    <td class="p-2 font-medium">${u.name}</td>
+                    <td 

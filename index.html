@@ -15,7 +15,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         .glass {
-            background: rgba(22, 27, 34, 0.85);
+            background: rgba(22, 27, 34, 0.9);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -31,29 +31,29 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between">
 
-    <!-- Auth / Login Modal (সরাসরি পেজ লোডে শো করবে যদি লগইন না থাকে) -->
-    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md">
+    <!-- Auth / Login Modal -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md">
         <div class="glass p-8 rounded-2xl w-full max-w-md border border-amber-500/40 shadow-2xl mx-4">
             <div class="text-center mb-6">
                 <i class="fa-solid fa-shield-halved text-5xl text-amber-500 mb-2"></i>
                 <h2 class="text-2xl font-bold tracking-wide text-white">Kabir CCTV Login</h2>
-                <p class="text-xs text-gray-400">আপনার তথ্য দিয়ে প্রবেশ করুন</p>
+                <p class="text-xs text-gray-400">আপনার নাম ও পাসওয়ার্ড দিন</p>
             </div>
             
             <!-- Ban Alert Message -->
             <div id="banMessage" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs text-center font-bold"></div>
 
-            <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-4">
+            <div class="space-y-4">
                 <div>
                     <label class="text-xs text-gray-300 block mb-1">আপনার নাম</label>
-                    <input type="text" id="username" required placeholder="Name enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
+                    <input type="text" id="username" placeholder="Name enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
                 <div>
                     <label class="text-xs text-gray-300 block mb-1">পাসওয়ার্ড</label>
-                    <input type="password" id="password" required placeholder="Password enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
+                    <input type="password" id="password" placeholder="Password enter করুন" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
-                <button type="submit" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition">Login</button>
-            </form>
+                <button type="button" onclick="submitLogin()" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition cursor-pointer">Login</button>
+            </div>
         </div>
     </div>
 
@@ -99,22 +99,22 @@
                 <!-- Add New Product Form -->
                 <div>
                     <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-plus-circle mr-1"></i> নতুন প্রোডাক্ট যোগ করুন</h3>
-                    <form onsubmit="handleAddProduct(event)" class="space-y-3">
-                        <input type="text" id="prodName" placeholder="প্রোডাক্ট এর নাম" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <div class="space-y-3">
+                        <input type="text" id="prodName" placeholder="প্রোডাক্ট এর নাম" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         <select id="prodCategory" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                             <option value="100x Zoom Camera">100x Zoom Camera</option>
                             <option value="Kabir Bhai Special Bedroom Camera">Kabir Bhai Special Bedroom Camera</option>
                             <option value="Ground Floor Kabir CCTV">Ground Floor Kabir CCTV</option>
                             <option value="All-Rounder CCTV Kabir">All-Rounder CCTV Kabir</option>
                         </select>
-                        <input type="text" id="prodImg" placeholder="Image URL (http://...)" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                        <input type="text" id="prodDesc" placeholder="প্রোডাক্ট এর বিস্তারিত Details" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <input type="text" id="prodImg" placeholder="Image URL (http://...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <input type="text" id="prodDesc" placeholder="প্রোডাক্ট এর বিস্তারিত Details" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         <div class="flex gap-2">
                             <input type="text" id="prodDiscount" placeholder="Discount Code" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                            <input type="number" id="prodPrice" placeholder="মূল্য (BDT)" required class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                            <input type="number" id="prodPrice" placeholder="মূল্য (BDT)" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         </div>
-                        <button type="submit" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90">Add Product</button>
-                    </form>
+                        <button type="button" onclick="handleAddProduct()" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90">Add Product</button>
+                    </div>
                 </div>
 
                 <!-- Logged-in Users & Ban System -->
@@ -130,7 +130,7 @@
                                 </tr>
                             </thead>
                             <tbody id="usersTableBody">
-                                <!-- User records populated here -->
+                                <!-- Users listed here -->
                             </tbody>
                         </table>
                     </div>
@@ -146,7 +146,7 @@
 
         <!-- Products Display Grid -->
         <div id="productsGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Dynamic Products will load here -->
+            <!-- Dynamic Products load here -->
         </div>
     </main>
 
@@ -199,8 +199,8 @@
         let currentUser = null;
         let isOwner = false;
 
-        // Page Load Engine
-        window.addEventListener('DOMContentLoaded', () => {
+        // On Page Load
+        window.onload = function() {
             if (!localStorage.getItem('kabir_products')) {
                 localStorage.setItem('kabir_products', JSON.stringify(defaultProducts));
             }
@@ -211,23 +211,26 @@
                     logoutUser();
                 } else {
                     currentUser = savedUser;
-                    document.getElementById('loginModal').classList.add('hidden');
+                    document.getElementById('loginModal').style.display = 'none';
                     updateUserUI();
                 }
             } else {
-                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('loginModal').style.display = 'flex';
             }
+
+            // Keyboard Enter key listener for login inputs
+            document.getElementById('username').addEventListener('keypress', function(e) { if(e.key === 'Enter') submitLogin(); });
+            document.getElementById('password').addEventListener('keypress', function(e) { if(e.key === 'Enter') submitLogin(); });
             
             renderProducts();
-        });
+        };
 
         function openLoginModal() {
-            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').style.display = 'flex';
         }
 
-        // Login Handler
-        function handleLogin(e) {
-            e.preventDefault();
+        // Direct Login Action
+        function submitLogin() {
             const name = document.getElementById('username').value.trim();
             const pass = document.getElementById('password').value.trim();
             const banMsg = document.getElementById('banMessage');
@@ -239,7 +242,7 @@
                 return;
             }
 
-            // Check if Banned
+            // Ban Check
             const banStatus = checkBanStatus(name);
             if (banStatus.banned) {
                 banMsg.innerText = banStatus.message;
@@ -247,28 +250,29 @@
                 return;
             }
 
+            // Save login
             const userObj = { name, pass };
             localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
             currentUser = userObj;
 
-            // Save to overall history
             let userList = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
             if(!userList.some(u => u.name === name)) {
                 userList.push(userObj);
                 localStorage.setItem('kabir_user_history', JSON.stringify(userList));
             }
 
-            document.getElementById('loginModal').classList.add('hidden');
+            // Close Modal & Refresh View
+            document.getElementById('loginModal').style.display = 'none';
             updateUserUI();
         }
 
-        // Promo Code Applied
+        // Promo Code Logic
         function applyPromo() {
             const inputField = document.getElementById('promoInput');
             const code = inputField.value.trim();
-            
+
             if (!code) {
-                alert("দয়া করে একটি প্রমো কোড লিখুন!");
+                alert("দয়া করে প্রমো কোড লিখুন!");
                 return;
             }
 
@@ -317,7 +321,7 @@
             currentUser = null;
             isOwner = false;
             document.getElementById('userDisplayName').innerText = "Guest";
-            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').style.display = 'flex';
             updateUserUI();
         }
 
@@ -355,16 +359,20 @@
             });
         }
 
-        function handleAddProduct(e) {
-            e.preventDefault();
+        function handleAddProduct() {
             if (!isOwner) return;
 
-            const name = document.getElementById('prodName').value;
+            const name = document.getElementById('prodName').value.trim();
             const category = document.getElementById('prodCategory').value;
-            const image = document.getElementById('prodImg').value;
-            const desc = document.getElementById('prodDesc').value;
-            const discount = document.getElementById('prodDiscount').value;
-            const price = document.getElementById('prodPrice').value;
+            const image = document.getElementById('prodImg').value.trim();
+            const desc = document.getElementById('prodDesc').value.trim();
+            const discount = document.getElementById('prodDiscount').value.trim();
+            const price = document.getElementById('prodPrice').value.trim();
+
+            if(!name || !image || !price) {
+                alert("দয়া করে নাম, ছবির লিংক এবং দাম দিন!");
+                return;
+            }
 
             const products = JSON.parse(localStorage.getItem('kabir_products')) || [];
             products.push({ id: Date.now(), name, category, image, desc, discount, price });
@@ -372,11 +380,4 @@
             
             document.getElementById('prodName').value = '';
             document.getElementById('prodImg').value = '';
-            document.getElementById('prodDesc').value = '';
-            document.getElementById('prodDiscount').value = '';
-            document.getElementById('prodPrice').value = '';
-
-            renderProducts();
-            alert("প্রোডাক্ট সফলভাবে যোগ করা হয়েছে!");
-        }
-            
+     

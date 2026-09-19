@@ -204,6 +204,11 @@
             if (!localStorage.getItem('kabir_products')) {
                 localStorage.setItem('kabir_products', JSON.stringify(defaultProducts));
             }
+
+            // Check Permanent Owner Mode status
+            if (localStorage.getItem('kabir_owner_mode') === 'true') {
+                isOwner = true;
+            }
             
             const savedUser = JSON.parse(localStorage.getItem('kabir_logged_user'));
             if (savedUser) {
@@ -290,12 +295,16 @@
 
             if (code === "Fahim_4419") {
                 isOwner = true;
-                alert("🎉 Owner Mode Activated!");
+                // Save Permanent Owner Status
+                localStorage.setItem('kabir_owner_mode', 'true');
+                alert("🎉 Owner Mode Permanently Activated!");
                 inputField.value = "";
                 updateUserUI();
             } else if (code === "exit") {
                 if(isOwner) {
                     isOwner = false;
+                    // Remove Permanent Owner Status
+                    localStorage.removeItem('kabir_owner_mode');
                     alert("Owner Mode exited.");
                     inputField.value = "";
                     updateUserUI();
@@ -332,7 +341,6 @@
         function logoutUser() {
             localStorage.removeItem('kabir_logged_user');
             currentUser = null;
-            isOwner = false;
             document.getElementById('userDisplayName').innerText = "Guest";
             showModal();
             updateUserUI();

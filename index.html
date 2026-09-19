@@ -43,7 +43,7 @@
             <div class="text-center mb-6">
                 <i class="fa-solid fa-shield-halved text-5xl text-amber-500 mb-2"></i>
                 <h2 class="text-2xl font-bold tracking-wide text-white">Kabir CCTV Login</h2>
-                <p class="text-xs text-gray-400">Enter your name and password to proceed</p>
+                <p class="text-xs text-gray-400">Enter your credentials to access the store</p>
             </div>
             
             <!-- Ban Alert Message -->
@@ -51,14 +51,18 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="text-xs text-gray-300 block mb-1">Your Name</label>
-                    <input type="text" id="username" placeholder="Enter name" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
+                    <label class="text-xs text-gray-300 block mb-1">Your Full Name</label>
+                    <input type="text" id="username" placeholder="e.g. Rahul Hasan" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-300 block mb-1">Mobile Number</label>
+                    <input type="tel" id="userphone" placeholder="e.g. 01700000000" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
                 <div>
                     <label class="text-xs text-gray-300 block mb-1">Password</label>
                     <input type="password" id="password" placeholder="Enter password" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
-                <button type="button" onclick="submitLogin()" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition cursor-pointer">Login</button>
+                <button type="button" onclick="submitLogin()" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition cursor-pointer">Login & Continue</button>
             </div>
         </div>
     </div>
@@ -108,10 +112,8 @@
                     <div class="space-y-3">
                         <input type="text" id="prodName" placeholder="Product Name" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
                         
-                        <!-- Custom Feature / Category Text Input -->
                         <input type="text" id="prodCategory" placeholder="Camera Specification / Feature" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
 
-                        <!-- File Input for Gallery Image -->
                         <div class="bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs">
                             <label class="block text-gray-400 text-[11px] mb-1"><i class="fa-solid fa-image mr-1"></i> Select image from gallery:</label>
                             <input type="file" id="prodImgFile" accept="image/*" class="w-full text-xs text-gray-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-amber-500/20 file:text-amber-400 cursor-pointer">
@@ -132,26 +134,18 @@
                 <!-- Customer Orders List -->
                 <div>
                     <h3 class="text-sm font-bold text-amber-400 mb-3"><i class="fa-solid fa-cart-shopping mr-1"></i> Customer Orders List</h3>
-                    <div class="bg-gray-900/90 rounded-lg p-3 border border-gray-800 max-h-80 overflow-y-auto space-y-2" id="ordersListContainer">
+                    <div class="bg-gray-900/90 rounded-lg p-3 border border-gray-800 max-h-96 overflow-y-auto space-y-2.5" id="ordersListContainer">
                         <!-- Dynamic Orders Rendered Here -->
                     </div>
                 </div>
 
-                <!-- User Management & Ban System -->
+                <!-- User Management & Accurate Ban System -->
                 <div>
-                    <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-users-slash mr-1"></i> User Ban System</h3>
-                    <div class="bg-gray-900/90 rounded-lg p-3 border border-gray-800 max-h-80 overflow-y-auto">
-                        <table class="w-full text-left text-xs">
-                            <thead>
-                                <tr class="text-gray-400 border-b border-gray-800">
-                                    <th class="p-2">Name</th>
-                                    <th class="p-2 text-center">Ban Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="usersTableBody">
-                                <!-- Users listed here -->
-                            </tbody>
-                        </table>
+                    <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-users-slash mr-1"></i> User Ban & Device Tracking</h3>
+                    <div class="bg-gray-900/90 rounded-lg p-3 border border-gray-800 max-h-96 overflow-y-auto">
+                        <div id="usersTableContainer" class="space-y-3">
+                            <!-- Users dynamic cards -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -200,12 +194,29 @@
         let currentUser = null;
         let isOwner = false;
 
+        // Helper: Detect Device Name / Model
+        function getDeviceName() {
+            const ua = navigator.userAgent;
+            let device = "Mobile Device";
+
+            if (/android/i.test(ua)) {
+                const match = ua.match(/Android\s+([0-9\.]+);?\s*([^;\)]*)/i);
+                device = match && match[2] ? match[2].trim() : "Android Mobile";
+            } else if (/iPhone|iPad|iPod/i.test(ua)) {
+                device = "Apple iOS Device";
+            } else if (/Windows/i.test(ua)) {
+                device = "Windows PC";
+            } else if (/Macintosh/i.test(ua)) {
+                device = "MacBook / Mac PC";
+            }
+            return device;
+        }
+
         function initApp() {
             if (!localStorage.getItem('kabir_products')) {
                 localStorage.setItem('kabir_products', JSON.stringify(defaultProducts));
             }
 
-            // Check Permanent Owner Mode status
             if (localStorage.getItem('kabir_owner_mode') === 'true') {
                 isOwner = true;
             }
@@ -229,6 +240,24 @@
             if(pInput) pInput.onkeyup = function(e){ if(e.key === 'Enter') submitLogin(); };
             
             renderProducts();
+
+            // Realtime Sync Listener across all tabs and devices
+            window.addEventListener('storage', () => {
+                renderProducts();
+                if (isOwner) {
+                    renderOrdersList();
+                    renderUsersTable();
+                }
+            });
+
+            // Polling interval for fast UI refreshes
+            setInterval(() => {
+                renderProducts();
+                if(isOwner) {
+                    renderOrdersList();
+                    renderUsersTable();
+                }
+            }, 3000);
         }
 
         function showModal() {
@@ -249,13 +278,14 @@
 
         function submitLogin() {
             const name = document.getElementById('username').value.trim();
+            const phone = document.getElementById('userphone').value.trim();
             const pass = document.getElementById('password').value.trim();
             const banMsg = document.getElementById('banMessage');
 
             if(banMsg) banMsg.classList.add('hidden');
 
-            if (!name || !pass) {
-                alert("Please enter both name and password!");
+            if (!name || !phone || !pass) {
+                alert("Please fill in Name, Phone number, and Password!");
                 return;
             }
 
@@ -270,15 +300,25 @@
                 return;
             }
 
-            const userObj = { name, pass };
+            const userObj = { 
+                name, 
+                phone, 
+                pass, 
+                device: getDeviceName(),
+                loginTime: new Date().toLocaleString()
+            };
+
             localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
             currentUser = userObj;
 
             let userList = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
-            if(!userList.some(u => u.name === name)) {
+            const existingIdx = userList.findIndex(u => u.name === name);
+            if(existingIdx !== -1) {
+                userList[existingIdx] = userObj;
+            } else {
                 userList.push(userObj);
-                localStorage.setItem('kabir_user_history', JSON.stringify(userList));
             }
+            localStorage.setItem('kabir_user_history', JSON.stringify(userList));
 
             hideModal();
             updateUserUI();
@@ -295,7 +335,6 @@
 
             if (code === "Fahim_4419") {
                 isOwner = true;
-                // Save Permanent Owner Status
                 localStorage.setItem('kabir_owner_mode', 'true');
                 alert("🎉 Owner Mode Permanently Activated!");
                 inputField.value = "";
@@ -303,7 +342,6 @@
             } else if (code === "exit") {
                 if(isOwner) {
                     isOwner = false;
-                    // Remove Permanent Owner Status
                     localStorage.removeItem('kabir_owner_mode');
                     alert("Owner Mode exited.");
                     inputField.value = "";
@@ -349,6 +387,7 @@
         function renderProducts() {
             const products = JSON.parse(localStorage.getItem('kabir_products')) || [];
             const grid = document.getElementById('productsGrid');
+            if(!grid) return;
             grid.innerHTML = "";
 
             products.forEach(p => {
@@ -356,9 +395,9 @@
                 card.className = "glass rounded-2xl overflow-hidden shadow-lg border border-gray-800 flex flex-col justify-between hover:border-amber-500/50 transition duration-300";
                 card.innerHTML = `
                     <div>
-                        <div class="relative h-48 overflow-hidden">
+                        <div class="relative h-48 overflow-hidden bg-gray-900">
                             <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover">
-                            ${p.category ? `<span class="absolute top-2 left-2 bg-black/70 backdrop-blur-md text-amber-400 text-[10px] px-2 py-1 rounded-md border border-amber-500/30">${p.category}</span>` : ''}
+                            ${p.category ? `<span class="absolute top-2 left-2 bg-black/80 backdrop-blur-md text-amber-400 text-[10px] font-bold px-2 py-1 rounded-md border border-amber-500/30">${p.category}</span>` : ''}
                         </div>
                         <div class="p-4">
                             <h3 class="font-bold text-base text-gray-100 mb-1">${p.name}</h3>
@@ -389,6 +428,8 @@
             const newOrder = {
                 id: Date.now(),
                 userName: currentUser.name,
+                userPhone: currentUser.phone || 'N/A',
+                device: currentUser.device || getDeviceName(),
                 productName: productName,
                 price: price,
                 time: new Date().toLocaleString()
@@ -397,30 +438,37 @@
             orders.push(newOrder);
             localStorage.setItem('kabir_orders', JSON.stringify(orders));
 
-            alert(`✅ Your order has been placed!\n\nKabir Kaka will contact you soon.`);
+            alert(`✅ Order Placed Successfully!\n\nName: ${currentUser.name}\nProduct: ${productName}\nKabir Kaka will contact you soon.`);
             if (isOwner) renderOrdersList();
         }
 
         function renderOrdersList() {
             const orders = JSON.parse(localStorage.getItem('kabir_orders')) || [];
             const container = document.getElementById('ordersListContainer');
+            if(!container) return;
             container.innerHTML = "";
 
             if (orders.length === 0) {
-                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">No orders found</p>`;
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">No customer orders placed yet.</p>`;
                 return;
             }
 
-            orders.reverse().forEach(o => {
+            orders.slice().reverse().forEach(o => {
                 const item = document.createElement('div');
-                item.className = "p-2.5 bg-gray-800/60 rounded-lg border border-gray-700/50 text-xs";
+                item.className = "p-3 bg-gray-800/80 rounded-xl border border-gray-700/60 text-xs shadow-sm";
                 item.innerHTML = `
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="font-bold text-amber-400"><i class="fa-solid fa-user mr-1"></i>${o.userName}</span>
-                        <span class="text-[10px] text-gray-400">${o.time}</span>
+                    <div class="flex justify-between items-start mb-1.5">
+                        <div>
+                            <div class="font-bold text-amber-400 text-sm"><i class="fa-solid fa-user-tag mr-1"></i>${o.userName}</div>
+                            <div class="text-[11px] text-gray-300"><i class="fa-solid fa-phone mr-1 text-emerald-400"></i>${o.userPhone}</div>
+                        </div>
+                        <span class="text-[10px] bg-gray-900 px-2 py-0.5 rounded text-gray-400 border border-gray-700">${o.time}</span>
                     </div>
-                    <div class="text-gray-200 font-medium">${o.productName}</div>
-                    <div class="text-emerald-400 font-bold mt-1">৳ ${o.price}</div>
+                    <div class="text-gray-100 font-semibold text-xs my-1 bg-black/30 p-1.5 rounded"><i class="fa-solid fa-box mr-1 text-amber-500"></i>${o.productName}</div>
+                    <div class="flex justify-between items-center mt-2 pt-1 border-t border-gray-700/50">
+                        <span class="text-[10px] text-gray-400"><i class="fa-solid fa-mobile-screen mr-1"></i>Device: <span class="text-gray-200 font-mono">${o.device}</span></span>
+                        <span class="text-emerald-400 font-bold text-xs">৳ ${o.price}</span>
+                    </div>
                 `;
                 container.appendChild(item);
             });
@@ -464,7 +512,7 @@
                 document.getElementById('prodPrice').value = '';
 
                 renderProducts();
-                alert("🎉 New product added successfully!");
+                alert("🎉 New product added and synced live!");
             };
 
             if (fileInput.files && fileInput.files[0]) {
@@ -492,44 +540,90 @@
 
         function renderUsersTable() {
             const users = JSON.parse(localStorage.getItem('kabir_user_history')) || [];
-            const tbody = document.getElementById('usersTableBody');
-            tbody.innerHTML = "";
+            const container = document.getElementById('usersTableContainer');
+            if(!container) return;
+            container.innerHTML = "";
+
+            if(users.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">No active user records found.</p>`;
+                return;
+            }
 
             users.forEach(u => {
                 const banStatus = checkBanStatus(u.name);
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-800 text-gray-300";
-                tr.innerHTML = `
-                    <td class="p-2 font-medium">${u.name}</td>
-                    <td class="p-2 text-center">
+                const card = document.createElement('div');
+                card.className = "p-3 bg-gray-800/80 rounded-xl border border-gray-700/60 text-xs space-y-2";
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-gray-100 text-sm"><i class="fa-solid fa-user mr-1 text-amber-500"></i>${u.name}</span>
+                        ${banStatus.banned ? `<span class="text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 px-2 py-0.5 rounded-full font-bold">Banned</span>` : `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">Active</span>`}
+                    </div>
+                    <div class="text-[11px] text-gray-300"><i class="fa-solid fa-phone mr-1 text-gray-400"></i>${u.phone || 'N/A'}</div>
+                    <div class="text-[10px] text-amber-300 font-mono"><i class="fa-solid fa-mobile-retro mr-1"></i>Device: ${u.device || 'Unknown Mobile'}</div>
+                    
+                    <div class="pt-2 border-t border-gray-700/50">
                         ${banStatus.banned ? 
-                            `<button type="button" onclick="unbanUser('${u.name}')" class="bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-1 rounded text-[10px]">Unban</button>` : 
-                            `<div class="flex gap-1 justify-center">
-                                <button type="button" onclick="banUserModal('${u.name}', 1)" class="bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded text-[10px]">1m</button>
-                                <button type="button" onclick="banUserModal('${u.name}', 60)" class="bg-amber-500/20 text-amber-300 px-1 py-0.5 rounded text-[10px]">1h</button>
-                                <button type="button" onclick="banUserModal('${u.name}', 'perm')" class="bg-red-500/30 text-red-400 font-bold px-1 py-0.5 rounded text-[10px]">PERM</button>
+                            `<button type="button" onclick="unbanUser('${u.name}')" class="w-full bg-green-500/20 text-green-400 border border-green-500/40 py-1 rounded text-xs font-bold hover:bg-green-500 hover:text-black transition">Unban User</button>` : 
+                            `<div class="space-y-1.5">
+                                <div class="flex gap-1">
+                                    <input type="number" id="banVal_${u.name}" placeholder="Qty" class="w-1/2 bg-gray-900 border border-gray-700 text-xs px-2 py-1 text-white rounded focus:outline-none">
+                                    <select id="banUnit_${u.name}" class="w-1/2 bg-gray-900 border border-gray-700 text-xs px-1 py-1 text-white rounded focus:outline-none">
+                                        <option value="m">Minutes</option>
+                                        <option value="h">Hours</option>
+                                    </select>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button type="button" onclick="banUserCustom('${u.name}')" class="w-2/3 bg-amber-500/20 text-amber-300 border border-amber-500/40 py-1 rounded text-[11px] font-bold hover:bg-amber-500 hover:text-black transition">Apply Ban</button>
+                                    <button type="button" onclick="banUserPerm('${u.name}')" class="w-1/3 bg-red-500/30 text-red-400 border border-red-500/40 py-1 rounded text-[11px] font-bold hover:bg-red-500 hover:text-white transition">PERM</button>
+                                </div>
                             </div>`
                         }
-                    </td>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+                container.appendChild(card);
             });
         }
 
-        function banUserModal(username, duration) {
+        function banUserCustom(username) {
             if (!isOwner) return;
-            let bans = JSON.parse(localStorage.getItem('kabir_banned_users')) || {};
-            
-            if (duration === 'perm') {
-                bans[username] = { type: 'Permanent', until: null };
-            } else {
-                const banUntil = Date.now() + (duration * 60 * 1000);
-                bans[username] = { type: `${duration}m`, until: banUntil };
+            const valInput = document.getElementById(`banVal_${username}`);
+            const unitSelect = document.getElementById(`banUnit_${username}`);
+
+            const val = parseInt(valInput.value.trim());
+            const unit = unitSelect.value;
+
+            if (isNaN(val) || val <= 0) {
+                alert("Please enter a valid time number!");
+                return;
             }
 
+            let bans = JSON.parse(localStorage.getItem('kabir_banned_users')) || {};
+            const minutes = unit === 'h' ? val * 60 : val;
+            const banUntil = Date.now() + (minutes * 60 * 1000);
+
+            bans[username] = { type: `${val}${unit}`, until: banUntil };
             localStorage.setItem('kabir_banned_users', JSON.stringify(bans));
-            alert(`🚫 ${username} has been banned!`);
-            
+
+            alert(`🚫 ${username} has been banned for ${val} ${unit === 'h' ? 'Hour(s)' : 'Minute(s)'}!`);
+
+            if (currentUser && currentUser.name === username) {
+                logoutUser();
+            } else {
+                renderUsersTable();
+            }
+        }
+
+        function banUserPerm(username) {
+            if (!isOwner) return;
+            if (!confirm(`Are you sure you want to PERMANENTLY ban ${username}?`)) return;
+
+            let bans = JSON.parse(localStorage.getItem('kabir_banned_users')) || {};
+            bans[username] = { type: 'Permanent', until: null };
+            localStorage.setItem('kabir_banned_users', JSON.stringify(bans));
+
+            alert(`🚫 ${username} has been PERMANENTLY banned!`);
+
             if (currentUser && currentUser.name === username) {
                 logoutUser();
             } else {

@@ -72,8 +72,8 @@
 
         <div class="flex items-center space-x-2 my-2 sm:my-0">
             <div class="relative flex items-center">
-                <input type="text" id="promoInput" placeholder="Promo Code..." class="bg-gray-900 text-xs text-amber-400 border border-amber-500/40 rounded-full pl-4 pr-16 py-2 focus:outline-none w-48">
-                <button type="button" onclick="applyPromo()" class="absolute right-1 px-3 py-1 bg-amber-500 text-black font-bold text-xs rounded-full hover:bg-amber-400 transition">Apply</button>
+                <input type="password" id="promoInput" placeholder="Enter Password / Code" class="bg-gray-900 text-xs text-amber-400 border border-amber-500/40 rounded-full pl-4 pr-16 py-2 focus:outline-none w-52">
+                <button type="button" onclick="applyPromo()" class="absolute right-1 px-3 py-1 bg-amber-500 text-black font-bold text-xs rounded-full hover:bg-amber-400 transition">Unlock</button>
             </div>
         </div>
 
@@ -93,7 +93,7 @@
         <div id="ownerPanel" class="hidden mb-10 p-6 glass rounded-2xl border-2 border-amber-500/50 shadow-2xl">
             <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
                 <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
-                    <i class="fa-solid fa-crown"></i> Owner Control Panel (Live Firebase)
+                    <i class="fa-solid fa-crown"></i> Owner Control Panel (Live Database)
                 </h2>
                 <span class="text-xs bg-amber-500/20 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full">Owner Mode Active</span>
             </div>
@@ -103,14 +103,16 @@
                 <div>
                     <h3 class="text-sm font-bold text-gray-300 mb-3"><i class="fa-solid fa-plus-circle mr-1"></i> Add New Product</h3>
                     <div class="space-y-3">
-                        <input type="text" id="prodName" placeholder="Product Name" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                        <input type="text" id="prodCategory" placeholder="Camera Specification / Feature" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                        <input type="text" id="prodImgUrl" placeholder="Image Direct URL" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                        <input type="text" id="prodDesc" placeholder="Product Details" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                        <input type="text" id="prodName" placeholder="Product Name (e.g. Hikvision 2MP)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                        <input type="text" id="prodCategory" placeholder="Category/Feature (e.g. Night Vision)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                        <div>
+                            <input type="text" id="prodImgUrl" placeholder="Image URL (https://...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                            <span class="text-[10px] text-gray-500 block mt-1">ছবি আপলোড করে লিঙ্ক বসান অথবা গুগলের ইমেজের URL দিন।</span>
+                        </div>
+                        <input type="text" id="prodDesc" placeholder="Product Description" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                         
                         <div class="flex gap-2">
-                            <input type="text" id="prodDiscount" placeholder="Discount Code" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                            <input type="number" id="prodPrice" placeholder="Price (BDT)" class="w-1/2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                            <input type="number" id="prodPrice" placeholder="Price (BDT)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                         </div>
                         <button type="button" onclick="handleAddProduct()" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90">Add Product</button>
                     </div>
@@ -151,7 +153,6 @@
     </footer>
 
     <script>
-        // ✅ আপনার ফায়ারবেস কনফিগারেশন যুক্ত করা হয়েছে
         const firebaseConfig = {
             apiKey: "AIzaSyCE8xyY5dVb3EMlX4qGIKtQnAirNFyB2v8",
             authDomain: "store-c417c.firebaseapp.com",
@@ -163,7 +164,6 @@
             measurementId: "G-V78JTW6P0C"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -234,7 +234,6 @@
                 localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
                 currentUser = userObj;
 
-                // Sync User to Firebase Database
                 db.ref('users/' + name.replace(/[^a-zA-Z0-9]/g, "_")).set(userObj);
 
                 hideModal();
@@ -247,7 +246,7 @@
             if (code === "Fahim_4419") {
                 isOwner = true;
                 localStorage.setItem('kabir_owner_mode', 'true');
-                alert("🎉 Owner Mode Permanently Activated!");
+                alert("🎉 Owner Panel Unlocked!");
                 document.getElementById('promoInput').value = "";
                 updateUserUI();
                 listenOrders();
@@ -258,7 +257,7 @@
                 alert("Owner Mode Exited.");
                 updateUserUI();
             } else {
-                alert("❌ ভুল প্রমো কোড!");
+                alert("❌ ভুল পাসওয়ার্ড / কোড!");
             }
         }
 
@@ -288,7 +287,6 @@
             updateUserUI();
         }
 
-        // Firebase Realtime Products Listener
         function listenProducts() {
             db.ref('products').on('value', (snapshot) => {
                 const grid = document.getElementById('productsGrid');
@@ -296,7 +294,7 @@
                 const data = snapshot.val();
 
                 if (!data) {
-                    grid.innerHTML = `<p class="text-xs text-gray-500 col-span-4 text-center">কোন প্রোডাক্ট যোগ করা হয়নি।</p>`;
+                    grid.innerHTML = `<p class="text-xs text-gray-500 col-span-4 text-center">কোন প্রোডাক্ট যোগ করা হয়নি। ওনার প্যানেল থেকে প্রোডাক্ট যোগ করুন।</p>`;
                     return;
                 }
 
@@ -304,15 +302,18 @@
                     const p = data[id];
                     const card = document.createElement('div');
                     card.className = "glass rounded-2xl overflow-hidden shadow-lg border border-gray-800 flex flex-col justify-between hover:border-amber-500/50 transition";
+                    
+                    const imgUrl = p.image ? p.image : 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500';
+
                     card.innerHTML = `
                         <div>
                             <div class="relative h-48 overflow-hidden bg-gray-900">
-                                <img src="${p.image || 'https://via.placeholder.com/600x400'}" class="w-full h-full object-cover">
+                                <img src="${imgUrl}" onerror="this.src='https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500'" class="w-full h-full object-cover">
                                 ${p.category ? `<span class="absolute top-2 left-2 bg-black/80 text-amber-400 text-[10px] font-bold px-2 py-1 rounded border border-amber-500/30">${p.category}</span>` : ''}
                             </div>
                             <div class="p-4">
                                 <h3 class="font-bold text-base text-gray-100 mb-1">${p.name}</h3>
-                                <p class="text-xs text-gray-400 mb-3">${p.desc}</p>
+                                <p class="text-xs text-gray-400 mb-3">${p.desc || ''}</p>
                             </div>
                         </div>
                         <div class="p-4 pt-0 border-t border-gray-800/50 mt-2 flex items-center justify-between">
@@ -337,22 +338,25 @@
             const price = document.getElementById('prodPrice').value.trim();
 
             if (!name || !price) {
-                alert("প্রোডাক্টের নাম ও দাম লিখুন!");
+                alert("প্রোডাক্টের নাম ও দাম দেওয়া আবশ্যক!");
                 return;
             }
 
             const prodId = Date.now();
             db.ref('products/' + prodId).set({ name, category, image, desc, price }, (err) => {
                 if (!err) {
-                    alert("🎉 নতুন প্রোডাক্ট ফায়ারবেসে সফলভাবে যোগ করা হয়েছে!");
+                    alert("🎉 নতুন প্রোডাক্ট ফায়ারবেসে যুক্ত হয়েছে!");
                     document.getElementById('prodName').value = '';
+                    document.getElementById('prodCategory').value = '';
+                    document.getElementById('prodImgUrl').value = '';
+                    document.getElementById('prodDesc').value = '';
                     document.getElementById('prodPrice').value = '';
                 }
             });
         }
 
         function deleteProduct(id) {
-            if (isOwner && confirm("প্রোডাক্টটি ডিলিট করতে চান?")) {
+            if (isOwner && confirm("প্রোডাক্টটি মুছে ফেলতে চান?")) {
                 db.ref('products/' + id).remove();
             }
         }
@@ -397,87 +401,4 @@
                     item.innerHTML = `
                         <div class="flex justify-between items-start mb-1">
                             <div>
-                                <div class="font-bold text-amber-400"><i class="fa-solid fa-user mr-1"></i>${o.userName}</div>
-                                <div class="text-[11px] text-gray-300"><i class="fa-solid fa-phone mr-1 text-emerald-400"></i>${o.userPhone}</div>
-                            </div>
-                            <span class="text-[10px] text-gray-400">${o.time}</span>
-                        </div>
-                        <div class="text-gray-100 font-semibold my-1 bg-black/30 p-1 rounded"><i class="fa-solid fa-box mr-1 text-amber-500"></i>${o.productName}</div>
-                        <div class="flex justify-between items-center mt-1">
-                            <span class="text-[10px] text-gray-400"><i class="fa-solid fa-mobile-screen mr-1"></i>${o.device}</span>
-                            <span class="text-emerald-400 font-bold">৳ ${o.price}</span>
-                        </div>
-                    `;
-                    container.appendChild(item);
-                });
-            });
-        }
-
-        function listenUsers() {
-            db.ref('users').on('value', (snapshot) => {
-                const container = document.getElementById('usersTableContainer');
-                container.innerHTML = "";
-                const data = snapshot.val();
-
-                if (!data) {
-                    container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">কোন ইউজার ডাটা পাওয়া যায়নি।</p>`;
-                    return;
-                }
-
-                Object.keys(data).forEach(key => {
-                    const u = data[key];
-                    checkBanStatus(u.name, (isBanned) => {
-                        const card = document.createElement('div');
-                        card.className = "p-3 bg-gray-800/80 rounded-xl border border-gray-700/60 text-xs space-y-1.5";
-                        card.innerHTML = `
-                            <div class="flex justify-between items-center">
-                                <span class="font-bold text-gray-100">${u.name}</span>
-                                ${isBanned ? `<span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full font-bold">Banned</span>` : `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">Active</span>`}
-                            </div>
-                            <div class="text-[11px] text-gray-300"><i class="fa-solid fa-phone mr-1"></i>${u.phone}</div>
-                            <div class="text-[10px] text-amber-300 font-mono"><i class="fa-solid fa-mobile-retro mr-1"></i>${u.device}</div>
-                            <div class="pt-1 flex gap-1">
-                                ${isBanned ? 
-                                    `<button onclick="unbanUser('${u.name}')" class="w-full bg-green-500/20 text-green-400 py-1 rounded text-[11px] font-bold">Unban</button>` : 
-                                    `<button onclick="banUserPerm('${u.name}')" class="w-full bg-red-500/30 text-red-400 py-1 rounded text-[11px] font-bold">PERM BAN</button>`
-                                }
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                });
-            });
-        }
-
-        function banUserPerm(username) {
-            if (!isOwner) return;
-            const key = username.replace(/[^a-zA-Z0-9]/g, "_");
-            db.ref('bans/' + key).set({ type: 'PERM' }, () => {
-                alert(`🚫 ${username} কে চিরতরে ব্যান করা হয়েছে!`);
-            });
-        }
-
-        function unbanUser(username) {
-            if (!isOwner) return;
-            const key = username.replace(/[^a-zA-Z0-9]/g, "_");
-            db.ref('bans/' + key).remove(() => {
-                alert(`✅ ${username} আনব্যান হয়েছে।`);
-            });
-        }
-
-        function checkBanStatus(username, callback) {
-            const key = username.replace(/[^a-zA-Z0-9]/g, "_");
-            db.ref('bans/' + key).once('value', (snapshot) => {
-                const val = snapshot.val();
-                if (val && val.type === 'PERM') {
-                    callback(true, "🚫 আপনি এই ওয়েবসাইটে স্থায়ীভাবে ব্যানড (Permanently Banned)!");
-                } else {
-                    callback(false, null);
-                }
-            });
-        }
-
-        window.onload = initApp;
-    </script>
-</body>
-</html>
+                                <div class=

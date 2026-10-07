@@ -44,7 +44,7 @@
             <div class="text-center mb-6">
                 <i class="fa-solid fa-shield-halved text-5xl text-amber-500 mb-2"></i>
                 <h2 class="text-2xl font-bold tracking-wide text-white">Kabir CCTV Login</h2>
-                <p class="text-xs text-gray-400">Enter your credentials to access the store</p>
+                <p class="text-xs text-gray-400">প্রথমবার তথ্য দিলে একাউন্ট ক্রিয়েট হবে, পরদিন থেকে সেইম তথ্য দিয়ে ঢুকতে হবে।</p>
             </div>
 
             <div id="banMessage" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs text-center font-bold"></div>
@@ -57,6 +57,10 @@
                 <div>
                     <label class="text-xs text-gray-300 block mb-1">Mobile Number</label>
                     <input type="tel" id="userphone" placeholder="e.g. 01700000000" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-300 block mb-1">Account Password</label>
+                    <input type="password" id="userpassword" placeholder="Create or Enter Password" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-white">
                 </div>
                 <button type="button" onclick="submitLogin()" class="w-full gold-bg text-black font-bold py-2.5 rounded-lg hover:opacity-90 transition cursor-pointer">Login & Continue</button>
             </div>
@@ -72,7 +76,7 @@
 
         <div class="flex items-center space-x-2 my-2 sm:my-0">
             <div class="relative flex items-center">
-                <input type="password" id="promoInput" placeholder="Enter Password / Code" class="bg-gray-900 text-xs text-amber-400 border border-amber-500/40 rounded-full pl-4 pr-16 py-2 focus:outline-none w-52">
+                <input type="password" id="promoInput" placeholder="Enter Owner Password" class="bg-gray-900 text-xs text-amber-400 border border-amber-500/40 rounded-full pl-4 pr-16 py-2 focus:outline-none w-52">
                 <button type="button" onclick="applyPromo()" class="absolute right-1 px-3 py-1 bg-amber-500 text-black font-bold text-xs rounded-full hover:bg-amber-400 transition">Unlock</button>
             </div>
         </div>
@@ -105,16 +109,30 @@
                     <div class="space-y-3">
                         <input type="text" id="prodName" placeholder="Product Name (e.g. Hikvision 2MP)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                         <input type="text" id="prodCategory" placeholder="Category/Feature (e.g. Night Vision)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                        <div>
-                            <input type="text" id="prodImgUrl" placeholder="Image URL (https://...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                            <span class="text-[10px] text-gray-500 block mt-1">ছবি আপলোড করে লিঙ্ক বসান অথবা গুগলের ইমেজের URL দিন।</span>
+                        
+                        <!-- PHOTO UPLOAD & LINK OPTION -->
+                        <div class="space-y-2">
+                            <label class="text-[11px] text-amber-400 font-semibold block"><i class="fa-solid fa-image mr-1"></i> Add Product Photo</label>
+                            
+                            <!-- Gallery Upload Button -->
+                            <input type="file" id="prodFileInput" accept="image/*" onchange="previewImage(event)" class="w-full text-xs text-gray-400 bg-gray-900 border border-gray-700 rounded-lg p-1.5 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-amber-500 file:text-black hover:file:bg-amber-400 cursor-pointer">
+                            
+                            <!-- Or Image URL Input -->
+                            <input type="text" id="prodImgUrl" placeholder="Or enter Image URL (https://...)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
+                            
+                            <!-- Image Preview Area -->
+                            <div id="imagePreviewContainer" class="hidden relative mt-2 w-full h-32 rounded-lg border border-gray-700 overflow-hidden bg-gray-950 flex items-center justify-center">
+                                <img id="imagePreview" src="" class="h-full object-contain">
+                                <button type="button" onclick="removePreview()" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
                         </div>
+
                         <input type="text" id="prodDesc" placeholder="Product Description" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
 
                         <div class="flex gap-2">
                             <input type="number" id="prodPrice" placeholder="Price (BDT)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                         </div>
-                        <button type="button" onclick="handleAddProduct()" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90">Add Product</button>
+                        <button type="button" onclick="handleAddProduct()" class="w-full gold-bg text-black font-bold py-2 rounded-lg text-xs hover:opacity-90 cursor-pointer"><i class="fa-solid fa-plus mr-1"></i> Add Product</button>
                     </div>
                 </div>
 
@@ -169,6 +187,7 @@
 
         let currentUser = JSON.parse(localStorage.getItem('kabir_logged_user')) || null;
         let isOwner = localStorage.getItem('kabir_owner_mode') === 'true';
+        let uploadedBase64Image = "";
 
         function getDeviceName() {
             const ua = navigator.userAgent;
@@ -179,6 +198,27 @@
             else if (/Windows/i.test(ua)) return "Windows PC";
             else if (/Macintosh/i.test(ua)) return "MacBook";
             return "Mobile Device";
+        }
+
+        // Preview Image from Gallery Selection
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedBase64Image = e.target.result;
+                    document.getElementById('imagePreview').src = uploadedBase64Image;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePreview() {
+            uploadedBase64Image = "";
+            document.getElementById('prodFileInput').value = "";
+            document.getElementById('imagePreview').src = "";
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
         }
 
         function checkBanStatus(username, callback) {
@@ -239,14 +279,18 @@
             document.getElementById('loginModal').classList.add('modal-hidden');
         }
 
+        // Login & Register Logic with Password Check
         function submitLogin() {
             const name = document.getElementById('username').value.trim();
             const phone = document.getElementById('userphone').value.trim();
+            const password = document.getElementById('userpassword').value.trim();
 
-            if (!name || !phone) {
-                alert("আপনার নাম এবং মোবাইল নম্বর দিন!");
+            if (!name || !phone || !password) {
+                alert("আপনার নাম, মোবাইল নম্বর এবং পাসওয়ার্ড তিনটিই পূরণ করুন!");
                 return;
             }
+
+            const userKey = name.replace(/[^a-zA-Z0-9]/g, "_");
 
             checkBanStatus(name, (isBanned, msg) => {
                 if (isBanned) {
@@ -256,14 +300,34 @@
                     return;
                 }
 
-                const userObj = { name, phone, device: getDeviceName(), time: new Date().toLocaleString() };
-                localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
-                currentUser = userObj;
-
-                db.ref('users/' + name.replace(/[^a-zA-Z0-9]/g, "_")).set(userObj);
-
-                hideModal();
-                updateUserUI();
+                db.ref('users/' + userKey).once('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const existingUser = snapshot.val();
+                        // একাউন্ট থাকলে ফোন নম্বর এবং পাসওয়ার্ড চেক
+                        if (existingUser.phone === phone && existingUser.password === password) {
+                            const userObj = { name, phone, device: getDeviceName(), time: new Date().toLocaleString() };
+                            localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
+                            currentUser = userObj;
+                            hideModal();
+                            updateUserUI();
+                            alert("🎉 সফলভাবে লগইন করেছেন!");
+                        } else {
+                            alert("❌ ভুল পাসওয়ার্ড বা মোবাইল নম্বর! সঠিক তথ্য দিন।");
+                        }
+                    } else {
+                        // নতুন একাউন্ট রেজিস্টার করা হবে
+                        const userObj = { name, phone, password, device: getDeviceName(), time: new Date().toLocaleString() };
+                        db.ref('users/' + userKey).set(userObj, (err) => {
+                            if (!err) {
+                                localStorage.setItem('kabir_logged_user', JSON.stringify({ name, phone, device: userObj.device, time: userObj.time }));
+                                currentUser = userObj;
+                                hideModal();
+                                updateUserUI();
+                                alert("🎉 আপনার নতুন একাউন্ট তৈরি এবং লগইন সম্পন্ন হয়েছে!");
+                            }
+                        });
+                    }
+                });
             });
         }
 
@@ -333,7 +397,7 @@
 
                     card.innerHTML = `
                         <div>
-                            <div class="relative h-48 overflow-hidden bg-gray-900">
+                            <div class="relative h-48 overflow-hidden bg-gray-900 flex items-center justify-center">
                                 <img src="${imgUrl}" onerror="this.src='https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500'" class="w-full h-full object-cover">
                                 ${p.category ? `<span class="absolute top-2 left-2 bg-black/80 text-amber-400 text-[10px] font-bold px-2 py-1 rounded border border-amber-500/30">${p.category}</span>` : ''}
                             </div>
@@ -347,7 +411,7 @@
                                 <span class="text-xs text-gray-400 block">Price</span>
                                 <span class="text-lg font-bold text-amber-400">৳ ${p.price}</span>
                             </div>
-                            ${isOwner ? `<button onclick="deleteProduct('${id}')" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs font-semibold">Delete</button>` : `<button onclick="placeOrder('${p.name}',${p.price})" class="gold-bg text-black px-3 py-1.5 rounded-lg text-xs font-bold">Order Now</button>`}
+                            ${isOwner ? `<button onclick="deleteProduct('${id}')" class="bg-red-500/20 text-red-400 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-red-500/30">Delete</button>` : `<button onclick="placeOrder('${p.name}',${p.price})" class="gold-bg text-black px-3 py-1.5 rounded-lg text-xs font-bold hover:opacity-90">Order Now</button>`}
                         </div>
                     `;
                     grid.appendChild(card);
@@ -359,9 +423,11 @@
             if (!isOwner) return;
             const name = document.getElementById('prodName').value.trim();
             const category = document.getElementById('prodCategory').value.trim();
-            const image = document.getElementById('prodImgUrl').value.trim();
+            const urlImg = document.getElementById('prodImgUrl').value.trim();
             const desc = document.getElementById('prodDesc').value.trim();
             const price = document.getElementById('prodPrice').value.trim();
+
+            const finalImage = uploadedBase64Image || urlImg;
 
             if (!name || !price) {
                 alert("প্রোডাক্টের নাম ও দাম দেওয়া আবশ্যক!");
@@ -369,14 +435,15 @@
             }
 
             const prodId = Date.now();
-            db.ref('products/' + prodId).set({ name, category, image, desc, price }, (err) => {
+            db.ref('products/' + prodId).set({ name, category, image: finalImage, desc, price }, (err) => {
                 if (!err) {
-                    alert("🎉 নতুন প্রোডাক্ট ফায়ারবেসে যুক্ত হয়েছে!");
+                    alert("🎉 নতুন প্রোডাক্ট ছবিসহ সফলভাবে যুক্ত হয়েছে!");
                     document.getElementById('prodName').value = '';
                     document.getElementById('prodCategory').value = '';
                     document.getElementById('prodImgUrl').value = '';
                     document.getElementById('prodDesc').value = '';
                     document.getElementById('prodPrice').value = '';
+                    removePreview();
                 }
             });
         }
@@ -453,7 +520,7 @@
                 const data = snapshot.val();
 
                 if (!data) {
-                    container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">কোন ইউজার ইউজার পাওয়া যায়নি।</p>`;
+                    container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">কোন ইউজার পাওয়া যায়নি।</p>`;
                     return;
                 }
 
@@ -466,7 +533,7 @@
                             <span class="font-semibold text-gray-200 block">${u.name}</span>
                             <span class="text-[10px] text-gray-400">${u.phone} • ${u.device}</span>
                         </div>
-                        <button onclick="banUser('${key}')" class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] font-bold">Ban</button>
+                        <button onclick="banUser('${key}')" class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] font-bold hover:bg-red-500/30">Ban</button>
                     `;
                     container.appendChild(item);
                 });
@@ -481,7 +548,6 @@
             }
         }
 
-        // Initialize App on Page Load
         window.onload = initApp;
     </script>
 </body>

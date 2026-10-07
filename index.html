@@ -211,6 +211,8 @@
                     document.getElementById('imagePreviewContainer').classList.remove('hidden');
                 };
                 reader.readAsDataURL(file);
+            } else {
+                removePreview();
             }
         }
 
@@ -303,7 +305,6 @@
                 db.ref('users/' + userKey).once('value', (snapshot) => {
                     if (snapshot.exists()) {
                         const existingUser = snapshot.val();
-                        // একাউন্ট থাকলে ফোন নম্বর এবং পাসওয়ার্ড চেক
                         if (existingUser.phone === phone && existingUser.password === password) {
                             const userObj = { name, phone, device: getDeviceName(), time: new Date().toLocaleString() };
                             localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
@@ -315,7 +316,6 @@
                             alert("❌ ভুল পাসওয়ার্ড বা মোবাইল নম্বর! সঠিক তথ্য দিন।");
                         }
                     } else {
-                        // নতুন একাউন্ট রেজিস্টার করা হবে
                         const userObj = { name, phone, password, device: getDeviceName(), time: new Date().toLocaleString() };
                         db.ref('users/' + userKey).set(userObj, (err) => {
                             if (!err) {
@@ -427,6 +427,7 @@
             const desc = document.getElementById('prodDesc').value.trim();
             const price = document.getElementById('prodPrice').value.trim();
 
+            // Prioritize newly selected uploaded image, fallback to URL input
             const finalImage = uploadedBase64Image || urlImg;
 
             if (!name || !price) {
@@ -443,7 +444,7 @@
                     document.getElementById('prodImgUrl').value = '';
                     document.getElementById('prodDesc').value = '';
                     document.getElementById('prodPrice').value = '';
-                    removePreview();
+                    removePreview(); // Reset uploaded image memory state
                 }
             });
         }

@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -46,7 +46,7 @@
                 <h2 class="text-2xl font-bold tracking-wide text-white">Kabir CCTV Login</h2>
                 <p class="text-xs text-gray-400">Enter your credentials to access the store</p>
             </div>
-            
+
             <div id="banMessage" class="hidden mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-xs text-center font-bold"></div>
 
             <div class="space-y-4">
@@ -110,7 +110,7 @@
                             <span class="text-[10px] text-gray-500 block mt-1">ছবি আপলোড করে লিঙ্ক বসান অথবা গুগলের ইমেজের URL দিন।</span>
                         </div>
                         <input type="text" id="prodDesc" placeholder="Product Description" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
-                        
+
                         <div class="flex gap-2">
                             <input type="number" id="prodPrice" placeholder="Price (BDT)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none">
                         </div>
@@ -181,6 +181,17 @@
             return "Mobile Device";
         }
 
+        function checkBanStatus(username, callback) {
+            const userKey = username.replace(/[^a-zA-Z0-9]/g, "_");
+            db.ref('bannedUsers/' + userKey).once('value', (snapshot) => {
+                if (snapshot.exists()) {
+                    callback(true, "আপনার অ্যাকাউন্টটি অ্যাডমিন দ্বারা ব্যান করা হয়েছে!");
+                } else {
+                    callback(false, null);
+                }
+            });
+        }
+
         function initApp() {
             if (currentUser) {
                 checkBanStatus(currentUser.name, (isBanned, msg) => {
@@ -196,11 +207,26 @@
                 showModal();
             }
 
+            seedDefaultProduct();
             listenProducts();
             if (isOwner) {
                 listenOrders();
                 listenUsers();
             }
+        }
+
+        function seedDefaultProduct() {
+            db.ref('products/default_kabir_ground_cctv').once('value', (snapshot) => {
+                if (!snapshot.exists()) {
+                    db.ref('products/default_kabir_ground_cctv').set({
+                        name: "Kabir Ground CCTV",
+                        category: "Night Vision + Secure",
+                        image: "https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=600",
+                        desc: "Night Vision + Secure System (High-performance ground surveillance & clear night monitoring)",
+                        price: "4500"
+                    });
+                }
+            });
         }
 
         function showModal() {
@@ -302,7 +328,7 @@
                     const p = data[id];
                     const card = document.createElement('div');
                     card.className = "glass rounded-2xl overflow-hidden shadow-lg border border-gray-800 flex flex-col justify-between hover:border-amber-500/50 transition";
-                    
+
                     const imgUrl = p.image ? p.image : 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500';
 
                     card.innerHTML = `
@@ -397,8 +423,66 @@
                 Object.keys(data).reverse().forEach(id => {
                     const o = data[id];
                     const item = document.createElement('div');
-                    item.className = "p-3 bg-gray-800/80 rounded-xl border border-gray-700/60 text-xs shadow-sm";
+                    item.className = "p-3 bg-gray-800/80 rounded-xl border border-gray-700/60 text-xs shadow-sm mb-2";
                     item.innerHTML = `
                         <div class="flex justify-between items-start mb-1">
                             <div>
-                                <div class=
+                                <span class="font-bold text-amber-400">${o.productName}</span>
+                                <span class="text-gray-400 block">${o.userName} (${o.userPhone})</span>
+                                <span class="text-[10px] text-gray-500">${o.device} • ${o.time}</span>
+                            </div>
+                            <span class="font-bold text-gray-200">৳ ${o.price}</span>
+                        </div>
+                        <button onclick="deleteOrder('${id}')" class="text-[10px] text-red-400 hover:underline mt-1">Delete Order</button>
+                    `;
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        function deleteOrder(id) {
+            if (isOwner && confirm("অর্ডারটি ডিলিট করতে চান?")) {
+                db.ref('orders/' + id).remove();
+            }
+        }
+
+        function listenUsers() {
+            db.ref('users').on('value', (snapshot) => {
+                const container = document.getElementById('usersTableContainer');
+                container.innerHTML = "";
+                const data = snapshot.val();
+
+                if (!data) {
+                    container.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">কোন ইউজার ইউজার পাওয়া যায়নি।</p>`;
+                    return;
+                }
+
+                Object.keys(data).forEach(key => {
+                    const u = data[key];
+                    const item = document.createElement('div');
+                    item.className = "p-2.5 bg-gray-800/60 rounded-lg text-xs flex justify-between items-center border border-gray-700/40";
+                    item.innerHTML = `
+                        <div>
+                            <span class="font-semibold text-gray-200 block">${u.name}</span>
+                            <span class="text-[10px] text-gray-400">${u.phone} • ${u.device}</span>
+                        </div>
+                        <button onclick="banUser('${key}')" class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-[10px] font-bold">Ban</button>
+                    `;
+                    container.appendChild(item);
+                });
+            });
+        }
+
+        function banUser(userKey) {
+            if (isOwner && confirm("ইউজারকে ব্যান করতে চান?")) {
+                db.ref('bannedUsers/' + userKey).set(true, (err) => {
+                    if (!err) alert("ইউজার ব্যান করা হয়েছে!");
+                });
+            }
+        }
+
+        // Initialize App on Page Load
+        window.onload = initApp;
+    </script>
+</body>
+</html>

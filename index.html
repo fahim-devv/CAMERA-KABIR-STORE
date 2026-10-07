@@ -50,7 +50,6 @@
         .modal-active { display: flex !important; }
         .modal-hidden { display: none !important; }
         
-        /* Toast Notification Styling */
         #toast-container {
             position: fixed;
             top: 20px;
@@ -250,14 +249,27 @@
             return "Mobile / Tablet";
         }
 
+        // Image compression system so image never fails or resets
         function previewImage(e) {
             const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(evt) {
-                    uploadedBase64Image = evt.target.result;
-                    document.getElementById('imagePreview').src = uploadedBase64Image;
-                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                    const img = new Image();
+                    img.src = evt.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 600;
+                        const scale = MAX_WIDTH / img.width;
+                        canvas.width = MAX_WIDTH;
+                        canvas.height = img.height * scale;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        uploadedBase64Image = canvas.toDataURL('image/jpeg', 0.7);
+                        document.getElementById('imagePreview').src = uploadedBase64Image;
+                        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                    };
                 };
                 reader.readAsDataURL(file);
             } else {
@@ -299,7 +311,6 @@
             document.getElementById('loginModal').classList.add('modal-hidden');
         }
 
-        // NO STUCK LOGIN: Works Instant Local first, then syncs background
         function submitLogin() {
             const name = document.getElementById('username').value.trim();
             const phone = document.getElementById('userphone').value.trim();
@@ -312,7 +323,6 @@
 
             const userObj = { name, phone, password, device: getDeviceName(), time: new Date().toLocaleString() };
             
-            // Save instantly to avoid hanging
             localStorage.setItem('kabir_logged_user', JSON.stringify(userObj));
             currentUser = userObj;
             
@@ -320,7 +330,6 @@
             updateUserUI();
             showToast(`Welcome back, ${name}!`);
 
-            // Background Firebase sync
             const userKey = name.replace(/[^a-zA-Z0-9]/g, "_");
             db.ref('users/' + userKey).set(userObj).catch(() => {});
         }
@@ -391,12 +400,12 @@
                 const card = document.createElement('div');
                 card.className = "glass-card rounded-2xl overflow-hidden flex flex-col justify-between hover:border-amber-500/40 transition group";
 
-                const imgUrl = p.image || 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500';
+                const imgUrl = (p.image && p.image.length > 5) ? p.image : 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500';
 
                 card.innerHTML = `
                     <div>
                         <div class="relative h-52 overflow-hidden bg-slate-950 flex items-center justify-center">
-                            <img src="${imgUrl}" onerror="this.src='https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=500'" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <img src="${imgUrl}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             ${p.category ? `<span class="absolute top-3 left-3 bg-black/80 backdrop-blur-md text-amber-400 text-[10px] font-extrabold px-2.5 py-1 rounded-lg border border-amber-500/30 uppercase tracking-wider">${p.category}</span>` : ''}
                         </div>
                         <div class="p-5">
